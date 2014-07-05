@@ -1,14 +1,15 @@
-var express = require("express");
-var logfmt = require("logfmt");
-var app = express();
+var restify = require( 'restify' ),
+	colors = require( 'colors' );
 
-app.use(logfmt.requestLogger());
+var server = restify.createServer();
 
-app.get('/', function(req, res) {
-  res.send('Hello World!');
+server.get('/', function(req, res, next) {
+	//res.send("Hello World");
+	next( new restify.errors.NotAuthorizedError( { message: "test" } ) );
+}, function(req, res, next) {
+	res.send("Second time");
 });
 
-var port = Number(process.env.PORT || 1337);
-app.listen(port, function() {
-  console.log("Listening on " + port);
+server.listen(1337, function() {
+	console.log("Now listening on port 1337".green);
 });
