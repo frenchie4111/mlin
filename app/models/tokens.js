@@ -2,11 +2,6 @@ var database = require( "../../lib/database" ),
     util = require( "util" ),
     users = require( "../../app/models/users" );
 
-function Token() {
-
-}
-exports.Token = Token;
-
 exports.createToken = function( user, cb ) {
     var token = "TOKEN1";
     database.getDB().insert( {
@@ -59,5 +54,7 @@ exports.createViews = function( db, cb ) {
                 }
             }
         }
-    }, "_design/tokens" )
+    }, "_design/tokens", function( error, response ) {
+        cb();
+    } );
 }

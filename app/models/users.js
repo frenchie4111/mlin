@@ -129,7 +129,6 @@ exports.createViews = function( db, cb ) {
             }
         }
     }, "_design/users", function( error, response ) {
-        console.log( "\tInserted".green );
         cb();
     } );
 }
