@@ -31,11 +31,26 @@ function register( req, res, next ) {
     } );
 }
 
-exports.auth = function( req, res, next ) {
-
+exports.authenticationCheck = function( req, res, next ) {
+    if( req.headers["mlin-authentication"] != null ) {
+        users.getWithToken( req.headers["mlin-authentication"], function( user ) {
+            if( user != null ) {
+                req.user = user;
+                next();
+            } else {
+                res.send( new restify.errors.NotAuthorizedError( { message: "Invalid Token" } ) )
+            }
+        } );
+    } else {
+        res.send( new restify.errors.NotAuthorizedError( { message: "No Authentication Token Present" } ) )
+    }
 }
 
 exports.setRoutes = function( server ) {
     server.post( "/login", login );
     server.post( "/register", register );
+
+    server.get( "/test", exports.authenticationCheck, function( req, res, next ) {
+        res.send( req.user );
+    } )
 }

@@ -25,10 +25,7 @@ User.prototype.updateFromJson = function( json ) {
 
 User.prototype.update = function( cb ) {
     var self = this;
-    console.log( this );
     database.getDB().get( this._id, function( err, body ) {
-        console.log( util.inspect( body ) );
-
         self.updateFromJson( body );
 
         if( cb ) {
@@ -71,7 +68,6 @@ User.prototype.transact = function( changes, cb ) {
 User.prototype.newToken = function( cb ) {
     var token = genHash( this + Date.now() + "michael9" );
     this.transact( function( updated ) {
-        console.log( util.inspect( updated ) )
         updated.tokens.push( token );
         return updated;
     }, function() {
@@ -94,7 +90,18 @@ User.prototype.authenticate = function( password, cb ) { // cb( token, error )
 }
 
 exports.getWithUsername = function( username, cb ) {
-    database.getDB().view( "users", "by_username", function( err, body ) {
+    database.getDB().view( "users", "by_username", { key: username }, function( err, body ) {
+        if( body.rows.length == 1 ) {
+            user = new User( body.rows[0].value );
+            cb( user );
+        } else {
+            cb( null, "Username not found" );
+        }
+    } );
+}
+
+exports.getWithToken = function( token, cb ) { // cb( user, error )
+    database.getDB().view( "users", "by_token", { key: token }, function( err, body ) {
         if( body.rows.length == 1 ) {
             user = new User( body.rows[0].value );
             cb( user );
