@@ -1,9 +1,8 @@
 var restify = require( "restify" ),
     database = require( "../../lib/database" ),
     users = require( "../../app/models/users" ),
-    util = require( "util" );
-
-
+    util = require( "util" )
+    tokens = require( "../../app/models/tokens" );
 
 function login( req, res, next ) {
     var username = req.body.username;
@@ -31,10 +30,14 @@ function register( req, res, next ) {
     } );
 }
 
+function getMe( req, res, next ) {
+    res.send( req.user );
+}
+
 exports.authenticationCheck = function( req, res, next ) {
     if( req.headers["mlin-authentication"] != null ) {
-        users.getWithToken( req.headers["mlin-authentication"], function( user ) {
-            if( user != null ) {
+        tokens.userForToken( req.headers["mlin-authentication"], function( user, err ) {
+            if( !err ) {
                 req.user = user;
                 next();
             } else {
@@ -50,7 +53,5 @@ exports.setRoutes = function( server ) {
     server.post( "/login", login );
     server.post( "/register", register );
 
-    server.get( "/test", exports.authenticationCheck, function( req, res, next ) {
-        res.send( req.user );
-    } )
+    server.get( "/me", exports.authenticationCheck, getMe );
 }

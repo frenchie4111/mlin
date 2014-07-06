@@ -9,7 +9,8 @@ var controllers = [
 
 // Models imports
 var models = [
-	require( "./app/models/users" )
+	require( "./app/models/users" ),
+	require( "./app/models/tokens" )
 ];
 
 var server = restify.createServer();

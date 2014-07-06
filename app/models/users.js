@@ -1,14 +1,24 @@
 var database = require( "../../lib/database" ),
     Semaphore = require( "node-semaphore" ),
-    crypto = require( "crypto" )
-    util = require( "util" );
+    crypto = require( "crypto" ),
+    util = require( "util" ),
+    tokens = require( "../../app/models/tokens" );
 
 function User( json ) {
     this.updateFromJson( json );
 }
 exports.User = User;
 
+var semas = {};
 var sema = Semaphore( 1 );
+
+function getSema( id ) { // One semaphore per user
+    if( semas[id] == null ) {
+        semas[ id ] = new Semaphore( 1 );
+    }
+    return semas[ id ];
+}
+
 
 function genHash( str ) {
     return crypto.createHash( "sha1" ).update( str ).digest( "hex" );
@@ -20,7 +30,7 @@ User.prototype.updateFromJson = function( json ) {
     this.username = json.username;
     this.password = json.password;
     this.email = json.email;
-    this.tokens = json.tokens || [];
+    this.type = "user";
 }
 
 User.prototype.update = function( cb ) {
@@ -51,12 +61,12 @@ User.prototype.commit = function( cb ) {
 
 User.prototype.transact = function( changes, cb ) {
     var self = this;
-    sema.acquire( function() {
+    getSema( this._id ).acquire( function() {
         self.update( function( updated ) {
             updated = changes( updated );
 
             self.commit( function( err, body ) {
-                sema.release();
+                getSema( self._id ).release();
                 if( cb ) {
                     cb( body, err );
                 }
@@ -80,9 +90,9 @@ User.prototype.authenticate = function( password, cb ) { // cb( token, error )
 
     this.update( function( updated ) {
         if( updated.password === hashed_password ) {
-            updated.newToken( function( token ) {
+            tokens.createToken( updated, function( token ) {
                 cb( token, null );
-            } )
+            } );
         } else {
             cb( null, "Password Incorrect" );
         }
@@ -91,17 +101,6 @@ User.prototype.authenticate = function( password, cb ) { // cb( token, error )
 
 exports.getWithUsername = function( username, cb ) {
     database.getDB().view( "users", "by_username", { key: username }, function( err, body ) {
-        if( body.rows.length == 1 ) {
-            user = new User( body.rows[0].value );
-            cb( user );
-        } else {
-            cb( null, "Username not found" );
-        }
-    } );
-}
-
-exports.getWithToken = function( token, cb ) { // cb( user, error )
-    database.getDB().view( "users", "by_token", { key: token }, function( err, body ) {
         if( body.rows.length == 1 ) {
             user = new User( body.rows[0].value );
             cb( user );
@@ -124,14 +123,8 @@ exports.createViews = function( db, cb ) {
         "views": {
             "by_username": {
                 "map" : function( doc ) {
-                    emit( doc.username, doc );
-                }
-            },
-            "by_token": {
-                "map" : function( doc ) {
-                    doc.tokens.forEach( function( token ) {
-                        emit( token, doc );
-                    } );
+                    if( doc.type === "user" )
+                        emit( doc.username, doc );
                 }
             }
         }
