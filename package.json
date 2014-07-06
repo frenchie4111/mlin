@@ -19,6 +19,8 @@
   "dependencies": {
     "colors": "^0.6.2",
     "logfmt": "^1.1.2",
+    "nano": "^5.10.0",
+    "node-semaphore": "0.0.2",
     "restify": "^2.8.1"
   },
   "devDependencies": {
