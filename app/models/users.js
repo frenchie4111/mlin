@@ -48,12 +48,10 @@ User.prototype.commit = function( cb ) {
     var self = this;
     if( this._id != null ) {
         database.getDB().insert( this, this._id, function( err, body ) {
-            console.log( ("Committed user " + self._id).green );
             cb( body, err );
         } );
     } else {
         database.getDB().insert( this, function( err, body ) {
-            console.log( ("Committed user " + self._id).green );
             cb( body, err );
         } );
     }
@@ -117,8 +115,6 @@ exports.newUser = function( userJson, password ) {
 }
 
 exports.createViews = function( db, cb ) {
-    console.log( "\tCreating Users Views".green );
-
     db.insert( {
         "views": {
             "by_username": {

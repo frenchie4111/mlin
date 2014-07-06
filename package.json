@@ -21,7 +21,8 @@
     "logfmt": "^1.1.2",
     "nano": "^5.10.0",
     "node-semaphore": "0.0.2",
-    "restify": "^2.8.1"
+    "restify": "^2.8.1",
+    "winston": "^0.7.3"
   },
   "devDependencies": {
     "mocha": "^1.20.1",

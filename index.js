@@ -1,5 +1,6 @@
-var server = require( "./lib/server" );
+var server = require( "./lib/server" ),
+	winston = require( "winston" );
 
-server.start( 1337, "test", function() {
-	console.log( "Server initialized".green );
+server.start( { port: 1337, enviroment: "test" }, function() {
+	winston.info( "Server initialized".green );
 } );
