@@ -22,7 +22,7 @@ describe( "User Routing", function() {
             username: "test",
             password: "test",
             email: "test@test.com"
-        }
+        };
 
         it( "Should create account", function( done ) {
             request( url )
@@ -30,7 +30,7 @@ describe( "User Routing", function() {
                 .send( profile )
                 .expect( 200 )
                 .end( function( err, body ) {
-                    if( err ) { throw err; };
+                    if( err ) { throw err; }
 
 
 
@@ -44,7 +44,7 @@ describe( "User Routing", function() {
             username: "test2",
             password: "test2",
             email: "test2@test.com"
-        }
+        };
 
         it( "Should create account and sign in with it", function( done ) {
             request( url )
@@ -52,7 +52,7 @@ describe( "User Routing", function() {
                 .send( profile )
                 .expect( 200 )
                 .end( function( err, res ) {
-                    if( err ) { throw err; };
+                    if( err ) { throw err; }
 
                     assert.equal( profile.username, res.body.username );
                     assert.equal( profile.email, res.body.email );
@@ -63,7 +63,7 @@ describe( "User Routing", function() {
                         .expect( 200 )
                         .end( function( err, res ) {
 
-                            assert( res.body.token != null );
+                            assert( res.body.token !== null );
 
                             request( url )
                                 .get( "/me" )
