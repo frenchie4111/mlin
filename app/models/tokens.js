@@ -10,7 +10,7 @@ exports.createToken = function( user, cb ) {
     }, function( err, body ) {
         cb( body.id );
     } );
-}
+};
 
 exports.userForToken = function( token, cb ) {
     database.getDB().get( token, function( err, body ) {
@@ -21,12 +21,12 @@ exports.userForToken = function( token, cb ) {
                 } else {
                     cb( null, "No User for Userid" );
                 }
-            } )
+            } );
         } else {
             cb( null, "No User for Token" );
         }
     } );
-}
+};
 
 exports.createViews = function( db, cb ) {
     db.insert( {
@@ -57,4 +57,4 @@ exports.createViews = function( db, cb ) {
     }, "_design/tokens", function( error, response ) {
         cb();
     } );
-}
+};

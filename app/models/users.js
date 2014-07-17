@@ -13,7 +13,7 @@ var semas = {};
 var sema = Semaphore( 1 );
 
 function getSema( id ) { // One semaphore per user
-    if( semas[id] == null ) {
+    if( semas[id] === null ) {
         semas[ id ] = new Semaphore( 1 );
     }
     return semas[ id ];
@@ -31,7 +31,7 @@ User.prototype.updateFromJson = function( json ) {
     this.password = json.password;
     this.email = json.email;
     this.type = "user";
-}
+};
 
 User.prototype.update = function( cb ) {
     var self = this;
@@ -42,11 +42,11 @@ User.prototype.update = function( cb ) {
             cb( self, err );
         }
     } );
-}
+};
 
 User.prototype.commit = function( cb ) {
     var self = this;
-    if( this._id != null ) {
+    if( this._id !== null ) {
         database.getDB().insert( this, this._id, function( err, body ) {
             cb( body, err );
         } );
@@ -55,7 +55,7 @@ User.prototype.commit = function( cb ) {
             cb( body, err );
         } );
     }
-}
+};
 
 User.prototype.transact = function( changes, cb ) {
     var self = this;
@@ -69,9 +69,9 @@ User.prototype.transact = function( changes, cb ) {
                     cb( body, err );
                 }
             } );
-        } )
+        } );
     } );
-}
+};
 
 User.prototype.newToken = function( cb ) {
     var token = genHash( this + Date.now() + "michael9" );
@@ -81,7 +81,7 @@ User.prototype.newToken = function( cb ) {
     }, function() {
         cb( token );
     } );
-}
+};
 
 User.prototype.authenticate = function( password, cb ) { // cb( token, error )
     var hashed_password = genHash( password );
@@ -95,7 +95,7 @@ User.prototype.authenticate = function( password, cb ) { // cb( token, error )
             cb( null, "Password Incorrect" );
         }
     } );
-}
+};
 
 exports.getWithUsername = function( username, cb ) {
     database.getDB().view( "users", "by_username", { key: username }, function( err, body ) {
@@ -106,13 +106,13 @@ exports.getWithUsername = function( username, cb ) {
             cb( null, "Username not found" );
         }
     } );
-}
+};
 
 exports.newUser = function( userJson, password ) {
     user = new User( userJson );
     user.password = genHash( password );
     return user;
-}
+};
 
 exports.createViews = function( db, cb ) {
     db.insert( {
@@ -127,4 +127,4 @@ exports.createViews = function( db, cb ) {
     }, "_design/users", function( error, response ) {
         cb();
     } );
-}
+};
