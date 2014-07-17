@@ -2,23 +2,14 @@ var database = require( "../../lib/database" ),
     Semaphore = require( "node-semaphore" ),
     crypto = require( "crypto" ),
     util = require( "util" ),
-    tokens = require( "../../app/models/tokens" );
+    tokens = require( "../../app/models/tokens" ),
+    model = require( "./model" );
 
 function User( json ) {
     this.updateFromJson( json );
 }
 exports.User = User;
-
-var semas = {};
-var sema = Semaphore( 1 );
-
-function getSema( id ) { // One semaphore per user
-    if( semas[id] === null ) {
-        semas[ id ] = new Semaphore( 1 );
-    }
-    return semas[ id ];
-}
-
+util.inherits( User, model.Model );
 
 function genHash( str ) {
     return crypto.createHash( "sha1" ).update( str ).digest( "hex" );
@@ -31,56 +22,6 @@ User.prototype.updateFromJson = function( json ) {
     this.password = json.password;
     this.email = json.email;
     this.type = "user";
-};
-
-User.prototype.update = function( cb ) {
-    var self = this;
-    database.getDB().get( this._id, function( err, body ) {
-        self.updateFromJson( body );
-
-        if( cb ) {
-            cb( self, err );
-        }
-    } );
-};
-
-User.prototype.commit = function( cb ) {
-    var self = this;
-    if( this._id !== null ) {
-        database.getDB().insert( this, this._id, function( err, body ) {
-            cb( body, err );
-        } );
-    } else {
-        database.getDB().insert( this, function( err, body ) {
-            cb( body, err );
-        } );
-    }
-};
-
-User.prototype.transact = function( changes, cb ) {
-    var self = this;
-    getSema( this._id ).acquire( function() {
-        self.update( function( updated ) {
-            updated = changes( updated );
-
-            self.commit( function( err, body ) {
-                getSema( self._id ).release();
-                if( cb ) {
-                    cb( body, err );
-                }
-            } );
-        } );
-    } );
-};
-
-User.prototype.newToken = function( cb ) {
-    var token = genHash( this + Date.now() + "michael9" );
-    this.transact( function( updated ) {
-        updated.tokens.push( token );
-        return updated;
-    }, function() {
-        cb( token );
-    } );
 };
 
 User.prototype.authenticate = function( password, cb ) { // cb( token, error )
