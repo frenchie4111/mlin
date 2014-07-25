@@ -17,11 +17,12 @@
     "node": "0.10.x"
   },
   "dependencies": {
+    "body-parser": "^1.5.0",
     "colors": "^0.6.2",
+    "express": "^4.6.1",
     "logfmt": "^1.1.2",
     "nano": "^5.10.0",
     "node-semaphore": "0.0.2",
-    "restify": "^2.8.1",
     "winston": "^0.7.3"
   },
   "devDependencies": {

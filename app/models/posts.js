@@ -22,7 +22,13 @@ exports.posts = function( filters ) {
 exports.createViews = function( db, cb ) {
     db.insert( {
         'views': {
-        	'':''
+            'posts':{
+                'map': function( doc ) {
+                    if( doc.type === "post" ) {
+                        emit( doc._id, doc );
+                    }
+                }
+            }
         }
     }, '_design/posts', cb );
 };

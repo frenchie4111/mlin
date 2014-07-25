@@ -10,13 +10,13 @@ function login( req, res, next ) {
 
     users.getWithUsername( username, function( user, err ) {
         if( err ) {
-            next( new restify.errors.InvalidCredentialsError( { message: "Username Not Found" } ) );
+            return next( new Error( 'Username not found' ) );
         }
         user.authenticate( password, function( token, err ) {
             if( token !== null ) {
                 res.send( { success: true, token: token } );
             } else {
-                next( new restify.errors.InvalidCredentialsError( { message: err } ) );
+                return next( new Error( err ) );
             }
         } );
     } );

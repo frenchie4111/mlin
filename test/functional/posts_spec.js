@@ -8,7 +8,7 @@ describe( "Post Routing", function() {
     var token = "";
 
     before( function( beforeDone ) {
-        server.start( { port: 1337, enviroment: "test", print: true }, function() {
+        server.start( { port: 1337, enviroment: "test", print: false }, function() {
 
             winston.info( "Server started" );
 
