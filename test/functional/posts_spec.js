@@ -2,7 +2,7 @@ var request = require( "supertest" ),
     assert = require( "assert" ),
     server = require( "../../lib/server" );
 
-describe( "User Routing", function() {
+describe( "Post Routing", function() {
     var url = "http://localhost:1337";
     var token = "";
 
@@ -17,7 +17,7 @@ describe( "User Routing", function() {
                     email: "test2@test.com"
                 };
 
-                it( "Should create account and sign in with it", function( done ) {
+                it( "Should create account and sign in with it", function() {
                     request( url )
                         .post( "/register" )
                         .send( profile )
@@ -56,6 +56,27 @@ describe( "User Routing", function() {
 
         } );
     } );
+
+
+    describe('Create post', function() {
+
+        post = {
+            content: "This is a post"
+        };
+
+        it('Should create a post', function(done) {
+            request( url )
+                .post( '/posts' )
+                .send( post )
+                .expect( 200 )
+                .end( function( err, res ) {
+                    assert( res.body );
+                    assert.equal( res.body.content, post.content );
+
+                    done();
+                } );
+        });
+    });
 
     after( function( done ) {
         server.close( function() {
