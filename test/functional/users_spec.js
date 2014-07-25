@@ -6,7 +6,7 @@ describe( "User Routing", function() {
     var url = "http://localhost:1337";
 
     before( function( done ) {
-        server.start( { port: 1337, enviroment: "test", print: false }, function() {
+        server.start( { port: 1337, enviroment: "test", print: true }, function() {
             done();
         } );
     } );

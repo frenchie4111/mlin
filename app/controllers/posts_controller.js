@@ -5,7 +5,7 @@ function posts( req, res, next ) {
 }
 
 function createPost( req, res, next ) {
-
+	res.send( { content: 'This is a post' } );
 }
 
 exports.setRoutes = function( server ) {

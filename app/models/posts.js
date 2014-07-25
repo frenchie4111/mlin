@@ -24,7 +24,5 @@ exports.createViews = function( db, cb ) {
         'views': {
         	'':''
         }
-    }, '_design/posts', function( error, response ) {
-        cb();
-    } );
+    }, '_design/posts', cb );
 };

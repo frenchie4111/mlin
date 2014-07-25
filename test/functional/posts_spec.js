@@ -1,13 +1,16 @@
 var request = require( "supertest" ),
     assert = require( "assert" ),
-    server = require( "../../lib/server" );
+    server = require( "../../lib/server" ),
+    winston = require( "winston" );
 
 describe( "Post Routing", function() {
     var url = "http://localhost:1337";
     var token = "";
 
-    before( function( done ) {
-        server.start( { port: 1337, enviroment: "test", print: false }, function() {
+    before( function( beforeDone ) {
+        server.start( { port: 1337, enviroment: "test", print: true }, function() {
+
+            winston.info( "Server started" );
 
             // Register / Signon before testing posts
             describe( "User Login", function() {
@@ -17,49 +20,56 @@ describe( "Post Routing", function() {
                     email: "test2@test.com"
                 };
 
-                it( "Should create account and sign in with it", function() {
-                    request( url )
-                        .post( "/register" )
-                        .send( profile )
-                        .expect( 200 )
-                        .end( function( err, res ) {
-                            if( err ) { throw err; }
+                request( url )
+                    .post( "/register" )
+                    .send( profile )
+                    .expect( 200 )
+                    .end( function( err, res ) {
+                        if( err ) { 
+                            winston.error( "Server doesn't seem to be responding" );
+                            throw err; 
+                        }
 
-                            assert.equal( profile.username, res.body.username );
-                            assert.equal( profile.email, res.body.email );
+                        winston.info( "Created user" );
 
-                            request( url )
-                                .post( "/login" )
-                                .send( profile )
-                                .expect( 200 )
-                                .end( function( err, res ) {
+                        assert.equal( profile.username, res.body.username );
+                        assert.equal( profile.email, res.body.email );
 
-                                    assert( res.body.token !== null );
+                        request( url )
+                            .post( "/login" )
+                            .send( profile )
+                            .expect( 200 )
+                            .end( function( err, res ) {
 
-                                    request( url )
-                                        .get( "/me" )
-                                        .set( "mlin-authentication", res.body.token )
-                                        .expect( 200 )
-                                        .end( function( err, res ) {
+                                assert( res.body.token !== null );
 
-                                            assert( res.body );
-                                            assert.equal( res.body.username, profile.username );
-                                            assert.equal( res.body.email, profile.email );
+                                request( url )
+                                    .get( "/me" )
+                                    .set( "mlin-authentication", res.body.token )
+                                    .expect( 200 )
+                                    .end( function( err, res ) {
 
-                                            // All tests for posts happen here, after successful login
-                                            done();
-                                        } );
-                                } );
-                        } );
-                } );
+                                        assert( res.body );
+                                        assert.equal( res.body.username, profile.username );
+                                        assert.equal( res.body.email, profile.email );
+
+                                        // All tests for posts happen here, after successful login
+                                        beforeDone();
+                                    } );
+                            } );
+                    } );
             } );
 
         } );
     } );
 
+    after( function( done ) {
+        server.close( function() {
+            done();
+        } );
+    } );
 
     describe('Create post', function() {
-
         post = {
             content: "This is a post"
         };
@@ -77,13 +87,6 @@ describe( "Post Routing", function() {
                 } );
         });
     });
-
-    after( function( done ) {
-        server.close( function() {
-            done();
-        } );
-    } );
-
 } );
 
 
