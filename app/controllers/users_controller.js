@@ -2,7 +2,8 @@ var restify = require( "restify" ),
     database = require( "../../lib/database" ),
     users = require( "../../app/models/users" ),
     util = require( "util" ),
-    tokens = require( "../../app/models/tokens" );
+    tokens = require( "../../app/models/tokens" ),
+    winston = require( "winston" );
 
 function login( req, res, next ) {
     var username = req.body.username;
@@ -41,11 +42,11 @@ exports.authenticationCheck = function( req, res, next ) {
                 req.user = user;
                 next();
             } else {
-                res.send( new restify.errors.NotAuthorizedError( { message: "Invalid Token" } ) );
+                return next( new Error( 'Invalid Token' ) );
             }
         } );
     } else {
-        res.send( new restify.errors.NotAuthorizedError( { message: "No Authentication Token Present" } ) );
+        return next( new Error( 'No Authentication Token Present' ) );
     }
 };
 
