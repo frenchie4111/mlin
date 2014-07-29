@@ -7,7 +7,6 @@ function posts( req, res, next ) {
 }
 
 function createPost( req, res, next ) {
-	winston.info( "here" );
 	var post = new Posts.Post( req.body );
 	post.commit( function() {
 		res.send( post );

@@ -19,7 +19,7 @@ function getSema( id ) { // One semaphore per model instance
 exports.getSema = getSema;
 
 Model.prototype.updateFromJson = function( json ) {
-	winston.error( "Inheriting class must implement updateFromJson" );
+    throw new Error( "Inheriting class must implement updateFromJson" );
 };
 
 Model.prototype.update = function( cb ) {

@@ -11,13 +11,13 @@ function login( req, res, next ) {
 
     users.getWithUsername( username, function( user, err ) {
         if( err ) {
-            return next( new Error( 'Username not found' ) );
+            throw new Error( 'Username not found' );
         }
         user.authenticate( password, function( token, err ) {
             if( token !== null ) {
                 res.send( { success: true, token: token } );
             } else {
-                return next( new Error( err ) );
+                throw new Error( err );
             }
         } );
     } );
@@ -46,7 +46,7 @@ exports.authenticationCheck = function( req, res, next ) {
             }
         } );
     } else {
-        return next( new Error( 'No Authentication Token Present' ) );
+        throw new Error( 'No Authentication Token Present' );
     }
 };
 

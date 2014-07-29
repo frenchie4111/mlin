@@ -14,9 +14,11 @@ exports.createToken = function( user, cb ) {
 
 exports.userForToken = function( token, cb ) {
     database.getDB().get( token, function( err, body ) {
-        if( !err ) {
+        console.log( body );
+        if( !err && body.user ) {
             database.getDB().get( body.user, function( user_err, user_body ) {
                 if( !user_err ) {
+                    console.log( user_body );
                     cb( new users.User( user_body ), null );
                 } else {
                     cb( null, "No User for Userid" );
